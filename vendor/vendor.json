@@ -37,6 +37,18 @@
 			"revisionTime": "2017-06-09T00:35:04Z"
 		},
 		{
+			"checksumSHA1": "wAkl29YVUVK89WP6/7JZF9D22oE=",
+			"path": "github.com/swetharepakula/psifos",
+			"revision": "49702259ff8cd60975d0f1f70ff8d69ac92b2e4e",
+			"revisionTime": "2018-01-30T04:32:15Z"
+		},
+		{
+			"checksumSHA1": "tb88vxM+NQU9nCFNBuqpSzwns/c=",
+			"path": "github.com/swetharepakula/psifos/server",
+			"revision": "3fdd352eae7f01be885fcdd692193c5b3af5be30",
+			"revisionTime": "2018-01-30T01:39:42Z"
+		},
+		{
 			"checksumSHA1": "qvuIf+u1WPmJbfbaLWsn6d5YPR4=",
 			"path": "github.com/wcharczuk/go-chart",
 			"revision": "11e380634bd594f5635f2f8e89a6e8c075ec1222",

@@ -12,33 +12,13 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
+	psifos "github.com/swetharepakula/psifos/server"
 	chart "github.com/wcharczuk/go-chart"
 )
 
 type kyaliaServer struct {
 	listener net.Listener
 	db       *sql.DB
-}
-
-type VcapServices struct {
-	Pmysql []ServiceInstances `json:"p-mysql"`
-}
-
-type ServiceInstances struct {
-	Credentials Credentials `json:"credentials"`
-}
-
-type Credentials struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Hostname string `json:"hostname"`
-	Port     int    `json:"port"`
-	Name     string `json:"name"`
-}
-
-type Row struct {
-	Animal string
-	Votes  int
 }
 
 func main() {
@@ -49,7 +29,7 @@ func main() {
 
 	connBytes := os.Getenv("VCAP_SERVICES")
 
-	myServices := &VcapServices{}
+	myServices := &psifos.VcapServices{}
 	err = json.Unmarshal([]byte(connBytes), myServices)
 	FreakOut(err)
 	creds := myServices.Pmysql[0].Credentials
@@ -82,7 +62,7 @@ func (s *kyaliaServer) Start(port int) {
 		if strings.Contains(path, "/get/results") {
 			w.Header().Set("refresh", "1")
 			w.WriteHeader(200)
-			rows, err := s.getAllRows()
+			rows, err := psifos.GetAllRows(s.db)
 			FreakOut(err)
 
 			values := []chart.Value{}
@@ -116,27 +96,4 @@ func FreakOut(err error) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func (s *kyaliaServer) getAllRows() ([]Row, error) {
-	rows, err := s.db.Query("select * from pets")
-	if err != nil {
-		return []Row{}, err
-	}
-
-	defer rows.Close()
-
-	animals := []Row{}
-
-	for rows.Next() {
-
-		row := Row{}
-		err = rows.Scan(&row.Animal, &row.Votes)
-		if err != nil {
-			return []Row{}, err
-		}
-		animals = append(animals, row)
-	}
-
-	return animals, nil
 }
