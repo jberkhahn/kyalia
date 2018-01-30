@@ -37,8 +37,8 @@ type Credentials struct {
 }
 
 type Row struct {
-	Color string
-	Votes int
+	Animal string
+	Votes  int
 }
 
 func main() {
@@ -80,23 +80,29 @@ func (s *kyaliaServer) Start(port int) {
 	http.Serve(l, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
 		if strings.Contains(path, "/get/results") {
-			w.Header().Set("refresh", "5")
+			w.Header().Set("refresh", "1")
 			w.WriteHeader(200)
 			rows, err := s.getAllRows()
 			FreakOut(err)
 
 			values := []chart.Value{}
 			for _, v := range rows {
-				values = append(values, chart.Value{Value: float64(v.Votes), Label: v.Color})
+				values = append(values, chart.Value{Value: float64(v.Votes), Label: v.Animal})
 			}
 			pie := chart.PieChart{
-				Width:  512,
-				Height: 512,
+				Width:  1024,
+				Height: 1024,
 				Values: values,
 			}
 
 			w.Header().Set("Content-Type", "image/png")
 			err = pie.Render(chart.PNG, w)
+			if strings.Contains(err.Error(), "must contain at least") {
+				w.Header().Set("Content-Type", "text")
+				w.WriteHeader(503)
+				w.Write([]byte("Graph unavailble. Try writing data to the database."))
+				return
+			}
 			FreakOut(err)
 		}
 	}))
@@ -113,24 +119,24 @@ func FreakOut(err error) {
 }
 
 func (s *kyaliaServer) getAllRows() ([]Row, error) {
-	rows, err := s.db.Query("select * from colors")
+	rows, err := s.db.Query("select * from pets")
 	if err != nil {
 		return []Row{}, err
 	}
 
 	defer rows.Close()
 
-	colors := []Row{}
+	animals := []Row{}
 
 	for rows.Next() {
 
 		row := Row{}
-		err = rows.Scan(&row.Color, &row.Votes)
+		err = rows.Scan(&row.Animal, &row.Votes)
 		if err != nil {
 			return []Row{}, err
 		}
-		colors = append(colors, row)
+		animals = append(animals, row)
 	}
 
-	return colors, nil
+	return animals, nil
 }

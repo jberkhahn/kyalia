@@ -1,0 +1,107 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"path": "appengine/cloudsql",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "Ssktbpjqh4tN5BsyQ+/2zI1don4=",
+			"path": "github.com/blendlabs/go-exception",
+			"revision": "8d6614c6a381fe586fa618174af22043ff966730",
+			"revisionTime": "2017-10-24T19:22:40Z"
+		},
+		{
+			"checksumSHA1": "sYju+JUI2DOzsTSIY1DgNEeonKw=",
+			"path": "github.com/blendlabs/go-util",
+			"revision": "6326ad605727b9b3ff75448bd9287050aa6eecd3",
+			"revisionTime": "2018-01-28T23:19:45Z"
+		},
+		{
+			"checksumSHA1": "ZbU8qGzETzJZ2t30LmHxla5PLMY=",
+			"path": "github.com/go-sql-driver/mysql",
+			"revision": "bc14601d1bd56421dd60f561e6052c9ed77f9daf",
+			"revisionTime": "2018-01-25T05:47:45Z"
+		},
+		{
+			"checksumSHA1": "aJ/kX/eCUlrCJBZ26Hwh/RXzAIw=",
+			"path": "github.com/golang/freetype/raster",
+			"revision": "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4",
+			"revisionTime": "2017-06-09T00:35:04Z"
+		},
+		{
+			"checksumSHA1": "I3u9Uh9thka1gsgch6QEiPkaAr0=",
+			"path": "github.com/golang/freetype/truetype",
+			"revision": "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4",
+			"revisionTime": "2017-06-09T00:35:04Z"
+		},
+		{
+			"checksumSHA1": "qvuIf+u1WPmJbfbaLWsn6d5YPR4=",
+			"path": "github.com/wcharczuk/go-chart",
+			"revision": "11e380634bd594f5635f2f8e89a6e8c075ec1222",
+			"revisionTime": "2018-01-24T17:43:24Z"
+		},
+		{
+			"checksumSHA1": "/Amn4XivPItINSALiV/uQF8ogNw=",
+			"path": "github.com/wcharczuk/go-chart/drawing",
+			"revision": "11e380634bd594f5635f2f8e89a6e8c075ec1222",
+			"revisionTime": "2018-01-24T17:43:24Z"
+		},
+		{
+			"checksumSHA1": "kPqs986jHunAn+grWysGPIABnQc=",
+			"path": "github.com/wcharczuk/go-chart/matrix",
+			"revision": "11e380634bd594f5635f2f8e89a6e8c075ec1222",
+			"revisionTime": "2018-01-24T17:43:24Z"
+		},
+		{
+			"checksumSHA1": "XJZ8xjTjszuaBenrG5kB+jO1w/o=",
+			"path": "github.com/wcharczuk/go-chart/roboto",
+			"revision": "11e380634bd594f5635f2f8e89a6e8c075ec1222",
+			"revisionTime": "2018-01-24T17:43:24Z"
+		},
+		{
+			"checksumSHA1": "K2BgW05KUX00pQepbV36ulhHNhM=",
+			"path": "github.com/wcharczuk/go-chart/seq",
+			"revision": "11e380634bd594f5635f2f8e89a6e8c075ec1222",
+			"revisionTime": "2018-01-24T17:43:24Z"
+		},
+		{
+			"checksumSHA1": "zc0z91e8q0LCIIztdSs0Bp4z1SU=",
+			"path": "github.com/wcharczuk/go-chart/util",
+			"revision": "11e380634bd594f5635f2f8e89a6e8c075ec1222",
+			"revisionTime": "2018-01-24T17:43:24Z"
+		},
+		{
+			"checksumSHA1": "pQJ69B9xWCyF5FsO214fi+tnL44=",
+			"path": "golang.org/x/image/draw",
+			"revision": "12117c17ca67ffa1ce22e9409f3b0b0a93ac08c7",
+			"revisionTime": "2017-12-12T19:22:48Z"
+		},
+		{
+			"checksumSHA1": "+U1IB5N4LDS74y4fXjARb4/S4IE=",
+			"path": "golang.org/x/image/font",
+			"revision": "12117c17ca67ffa1ce22e9409f3b0b0a93ac08c7",
+			"revisionTime": "2017-12-12T19:22:48Z"
+		},
+		{
+			"checksumSHA1": "o7VkCGBiKM5HXzVzrIci1YDlpvc=",
+			"path": "golang.org/x/image/math/f64",
+			"revision": "12117c17ca67ffa1ce22e9409f3b0b0a93ac08c7",
+			"revisionTime": "2017-12-12T19:22:48Z"
+		},
+		{
+			"checksumSHA1": "euzvwlMLxyD0hwc+raoVsDLv6j4=",
+			"path": "golang.org/x/image/math/fixed",
+			"revision": "12117c17ca67ffa1ce22e9409f3b0b0a93ac08c7",
+			"revisionTime": "2017-12-12T19:22:48Z"
+		},
+		{
+			"checksumSHA1": "LiyXfqOzaeQ8vgYZH3t2hUEdVTw=",
+			"path": "google.golang.org/appengine/cloudsql",
+			"revision": "5bee14b453b4c71be47ec1781b0fa61c2ea182db",
+			"revisionTime": "2017-12-12T22:30:47Z"
+		}
+	],
+	"rootPath": "github.com/jberkhahn/kyalia"
+}
