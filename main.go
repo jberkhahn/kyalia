@@ -27,8 +27,8 @@ func main() {
 	server := NewKyaliaServer()
 	port := os.Getenv("PORT")
 	portNumber, err := strconv.Atoi(port)
-	FreakOut(err)
-	for err != nil {
+	BlowUp(err)
+	for err == nil {
 		connBytes := os.Getenv("VCAP_SERVICES")
 
 		myServices := &psifos.VcapServices{}
@@ -102,5 +102,11 @@ func (s *kyaliaServer) Stop() {
 func FreakOut(err error) {
 	if err != nil {
 		fmt.Println("Error: " + err.Error())
+	}
+}
+
+func BlowUp(err error) {
+	if err != nil {
+		panic(err)
 	}
 }
