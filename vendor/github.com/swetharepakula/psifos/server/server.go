@@ -21,7 +21,7 @@ type PsifosServer struct {
 }
 
 type VcapServices struct {
-	Pmysql []ServiceInstances `json:"p-mysql"`
+	Pmysql []ServiceInstances `json:"cleardb"`
 }
 
 type ServiceInstances struct {
@@ -32,7 +32,7 @@ type Credentials struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Hostname string `json:"hostname"`
-	Port     int    `json:"port"`
+	Port     string `json:"port"`
 	Name     string `json:"name"`
 }
 
@@ -53,53 +53,29 @@ func (s *PsifosServer) Start(port int) {
 		var err error
 
 		if strings.Contains(path, "/put/cats") {
-			_, err = s.Db.Exec("update pets set votes = votes + 1 where animal = ?", "cats")
+			err = s.PutCategoryOne()
 
 		} else if strings.Contains(path, "/put/dogs") {
-			_, err = s.Db.Exec("update pets set votes = votes + 1 where animal = ?", "dogs")
+			err = s.PutCategoryTwo()
 
 		} else if strings.Contains(path, "setup/database") {
-			_, err = s.Db.Exec("truncate table pets")
-			if err != nil {
-				driverErr, ok := err.(*mysql.MySQLError)
-				if !ok || driverErr.Number != 1146 {
-					// 1146 is error code for Table doesn't exist
-					RespondWithError(w, err)
-					return
-				}
-			}
-
-			_, err = s.Db.Exec("CREATE TABLE IF NOT EXISTS pets ( animal varchar(32), votes integer )")
-			if err != nil {
-				RespondWithError(w, err)
-				return
-			}
-
-			_, err = s.Db.Exec("insert into pets (animal, votes) values (?, ?)", "cats", 0)
-			if err != nil {
-				RespondWithError(w, err)
-				return
-			}
-
-			_, err = s.Db.Exec("insert into pets (animal, votes) values (?, ?)", "dogs", 0)
-			if err != nil {
-				RespondWithError(w, err)
-				return
-			}
+			err = s.SetupDatabase()
 		}
 
 		if err != nil {
 			RespondWithError(w, err)
-		} else {
-			rows, err := GetAllRows(s.Db)
-			if err != nil {
-				RespondWithError(w, err)
-				return
-			}
-			w.Header().Set("Content-type", "application/json")
-			w.WriteHeader(200)
-			w.Write([]byte(fmt.Sprintf("%v", rows)))
+			return
 		}
+
+		rows, err := GetAllRows(s.Db)
+		if err != nil {
+			RespondWithError(w, err)
+			return
+		}
+
+		w.Header().Set("Content-type", "application/json")
+		w.WriteHeader(200)
+		w.Write([]byte(fmt.Sprintf("%v", rows)))
 	}))
 }
 
@@ -111,6 +87,43 @@ func FreakOut(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (s *PsifosServer) PutCategoryOne() error {
+	_, err := s.Db.Exec("update pets set votes = votes + 1 where animal = ?", "dogs")
+	return err
+}
+
+func (s *PsifosServer) PutCategoryTwo() error {
+	_, err := s.Db.Exec("update pets set votes = votes + 1 where animal = ?", "cats")
+	return err
+}
+
+func (s *PsifosServer) SetupDatabase() error {
+
+	_, err := s.Db.Exec("truncate table pets")
+	if err != nil {
+		driverErr, ok := err.(*mysql.MySQLError)
+		if !ok || driverErr.Number != 1146 {
+			// 1146 is error code for Table doesn't exist
+			return err
+		}
+	}
+	_, err = s.Db.Exec("CREATE TABLE IF NOT EXISTS pets ( animal varchar(32), votes integer )")
+	if err != nil {
+		return err
+	}
+
+	_, err = s.Db.Exec("insert into pets (animal, votes) values (?, ?)", "cats", 0)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.Db.Exec("insert into pets (animal, votes) values (?, ?)", "dogs", 0)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func RespondWithError(w http.ResponseWriter, err error) {
