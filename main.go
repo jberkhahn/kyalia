@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -33,15 +34,19 @@ func main() {
 		myServices := &psifos.VcapServices{}
 		err = json.Unmarshal([]byte(connBytes), myServices)
 		FreakOut(err)
-		creds := myServices.Pmysql[0].Credentials
+		if len(myServices.Pmysql) > 0 {
+			creds := myServices.Pmysql[0].Credentials
 
-		connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", creds.Username, creds.Password, creds.Hostname, creds.Port, creds.Name)
+			connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", creds.Username, creds.Password, creds.Hostname, creds.Port, creds.Name)
 
-		server.db, err = sql.Open("mysql", connString)
-		FreakOut(err)
-		defer server.db.Close()
-		err = server.db.Ping()
-		FreakOut(err)
+			server.db, err = sql.Open("mysql", connString)
+			FreakOut(err)
+			defer server.db.Close()
+			err = server.db.Ping()
+			FreakOut(err)
+		} else {
+			err = errors.New("no pmysql instances found")
+		}
 		time.Sleep(5 * time.Second)
 	}
 	server.Start(portNumber)
