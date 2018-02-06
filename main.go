@@ -37,7 +37,7 @@ func main() {
 		if len(myServices.Pmysql) > 0 {
 			creds := myServices.Pmysql[0].Credentials
 
-			connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", creds.Username, creds.Password, creds.Hostname, creds.Port, creds.Name)
+			connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", creds.Username, creds.Password, creds.Hostname, creds.Port, creds.Name)
 
 			server.db, err = sql.Open("mysql", connString)
 			FreakOut(err)
