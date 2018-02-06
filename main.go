@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	psifos "github.com/swetharepakula/psifos/server"
@@ -26,22 +27,23 @@ func main() {
 	port := os.Getenv("PORT")
 	portNumber, err := strconv.Atoi(port)
 	FreakOut(err)
+	for err != nil {
+		connBytes := os.Getenv("VCAP_SERVICES")
 
-	connBytes := os.Getenv("VCAP_SERVICES")
+		myServices := &psifos.VcapServices{}
+		err = json.Unmarshal([]byte(connBytes), myServices)
+		FreakOut(err)
+		creds := myServices.Pmysql[0].Credentials
 
-	myServices := &psifos.VcapServices{}
-	err = json.Unmarshal([]byte(connBytes), myServices)
-	FreakOut(err)
-	creds := myServices.Pmysql[0].Credentials
+		connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", creds.Username, creds.Password, creds.Hostname, creds.Port, creds.Name)
 
-	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", creds.Username, creds.Password, creds.Hostname, creds.Port, creds.Name)
-
-	server.db, err = sql.Open("mysql", connString)
-	FreakOut(err)
-	defer server.db.Close()
-	err = server.db.Ping()
-	FreakOut(err)
-
+		server.db, err = sql.Open("mysql", connString)
+		FreakOut(err)
+		defer server.db.Close()
+		err = server.db.Ping()
+		FreakOut(err)
+		time.Sleep(5 * time.Second)
+	}
 	server.Start(portNumber)
 	defer server.Stop()
 }
@@ -94,6 +96,6 @@ func (s *kyaliaServer) Stop() {
 
 func FreakOut(err error) {
 	if err != nil {
-		panic(err)
+		fmt.Println("Error: " + err.Error())
 	}
 }
