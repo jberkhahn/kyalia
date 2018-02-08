@@ -58,7 +58,7 @@ func (s *kyaliaServer) Start(port int) {
 	http.Serve(l, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// path := r.URL.Path
 		// if strings.Contains(path, "/get/results") {
-		w.Header().Set("refresh", "1")
+		w.Header().Set("refresh", "3")
 		w.WriteHeader(200)
 		rows, err := psifos.GetAllRows(s.db)
 		FreakOut(err)
