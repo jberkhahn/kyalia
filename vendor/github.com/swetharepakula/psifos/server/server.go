@@ -2,10 +2,14 @@ package server
 
 import (
 	"database/sql"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/go-sql-driver/mysql"
@@ -20,14 +24,10 @@ type PsifosServer struct {
 	Db       *sql.DB
 }
 
-type ClearDBVcapServices struct {
-	ServiceInstances []ServiceInstances `json:"cleardb"`
-}
-type PmysqlVcapServices struct {
-	ServiceInstances []ServiceInstances `json:"pmysql"`
-}
-type UserProvidedVcapServices struct {
-	ServiceInstances []ServiceInstances `json:"user-provided"`
+type VcapServices struct {
+	ClearDBVcapServices      []ServiceInstances       `json:"cleardb"`
+	PmysqlVcapServices       []PMysqlServiceInstances `json:"p-mysql"`
+	UserProvidedVcapServices []ServiceInstances       `json:"user-provided"`
 }
 
 type ServiceInstances struct {
@@ -38,13 +38,67 @@ type Credentials struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Hostname string `json:"hostname"`
-	Port     string `json:"port"`
 	Name     string `json:"name"`
+	Port     string `json:"port"`
+}
+
+type PMysqlServiceInstances struct {
+	Credentials MysqlCredentials `json:"credentials"`
+}
+
+type MysqlCredentials struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Hostname string `json:"hostname"`
+	Name     string `json:"name"`
+	Port     int    `json:"port"`
 }
 
 type Row struct {
 	Animal string
 	Votes  int
+}
+
+func (s *VcapServices) GetCreds() (Credentials, error) {
+
+	if len(s.ClearDBVcapServices) > 0 {
+		return s.ClearDBVcapServices[0].Credentials, nil
+	}
+
+	if len(s.UserProvidedVcapServices) > 0 {
+		return s.UserProvidedVcapServices[0].Credentials, nil
+	}
+
+	if len(s.PmysqlVcapServices) > 0 {
+		mysql := s.PmysqlVcapServices[0].Credentials
+
+		return Credentials{
+			Username: mysql.Username,
+			Password: mysql.Password,
+			Hostname: mysql.Hostname,
+			Name:     mysql.Name,
+			Port:     strconv.Itoa(mysql.Port),
+		}, nil
+	}
+	return Credentials{}, errors.New("No Suitable Database")
+}
+
+func (creds *Credentials) ConnectionString() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", creds.Username, creds.Password, creds.Hostname, creds.Port, creds.Name)
+}
+
+func GetVcapServicesCreds() string {
+
+	connBytes := os.Getenv("VCAP_SERVICES")
+
+	myServices := &VcapServices{}
+	err := json.Unmarshal([]byte(connBytes), myServices)
+	FreakOut(err)
+
+	creds, err := myServices.GetCreds()
+	FreakOut(err)
+
+	return creds.ConnectionString()
 }
 
 func (s *PsifosServer) Start(port int) {

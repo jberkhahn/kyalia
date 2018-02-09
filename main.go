@@ -2,8 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -27,35 +25,8 @@ func main() {
 	port := os.Getenv("PORT")
 	portNumber, err := strconv.Atoi(port)
 	BlowUp(err)
-	connBytes := os.Getenv("VCAP_SERVICES")
 
-	var myServices interface{}
-	var creds psifos.Credentials
-	myServices = &psifos.ClearDBVcapServices{}
-	err = json.Unmarshal([]byte(connBytes), myServices)
-	psifos.FreakOut(err)
-	if len(myServices.(*psifos.ClearDBVcapServices).ServiceInstances) > 0 {
-		creds = myServices.(*psifos.ClearDBVcapServices).ServiceInstances[0].Credentials
-	} else {
-		myServices = &psifos.PmysqlVcapServices{}
-		err = json.Unmarshal([]byte(connBytes), myServices)
-		psifos.FreakOut(err)
-		if len(myServices.(*psifos.PmysqlVcapServices).ServiceInstances) > 0 {
-			creds = myServices.(*psifos.PmysqlVcapServices).ServiceInstances[0].Credentials
-		} else {
-			myServices = &psifos.UserProvidedVcapServices{}
-			err = json.Unmarshal([]byte(connBytes), myServices)
-			psifos.FreakOut(err)
-			if len(myServices.(*psifos.UserProvidedVcapServices).ServiceInstances) > 0 {
-				creds = myServices.(*psifos.UserProvidedVcapServices).ServiceInstances[0].Credentials
-			} else {
-				panic(errors.New("Cannot connect to a suitable database"))
-			}
-		}
-	}
-	connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", creds.Username, creds.Password, creds.Hostname, creds.Port, creds.Name)
-
-	server.db, err = sql.Open("mysql", connString)
+	server.db, err = sql.Open("mysql", psifos.GetVcapServicesCreds())
 	FreakOut(err)
 	defer server.db.Close()
 	err = server.db.Ping()
