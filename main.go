@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -28,10 +29,22 @@ func main() {
 	BlowUp(err)
 	connBytes := os.Getenv("VCAP_SERVICES")
 
-	myServices := &psifos.VcapServices{}
+	myServices := &server.ClearDBVcapServices{}
 	err = json.Unmarshal([]byte(connBytes), myServices)
-	FreakOut(err)
-	creds := myServices.Pmysql[0].Credentials
+	server.FreakOut(err)
+	if len(myServices.ServiceInstances) < 1 {
+		myServices = &server.PmysqlVcapServices{}
+		err = json.Unmarshal([]byte(connBytes), myServices)
+		server.FreakOut(err)
+	}
+	if len(myServices.ServiceInstances) < 1 {
+		myServices = &server.UserProvidVcapServices{}
+		err = json.Unmarshal([]byte(connBytes), myServices)
+		server.FreakOut(err)
+	}
+	if len(myServices.ServiceInstances) < 1 {
+		panic(errors.New("Cannot connect to a suitable database"))
+	}
 
 	connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", creds.Username, creds.Password, creds.Hostname, creds.Port, creds.Name)
 

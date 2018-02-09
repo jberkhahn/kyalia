@@ -20,8 +20,14 @@ type PsifosServer struct {
 	Db       *sql.DB
 }
 
-type VcapServices struct {
-	Pmysql []ServiceInstances `json:"cleardb"`
+type ClearDBVcapServices struct {
+	ServiceInstances []ServiceInstances `json:"cleardb"`
+}
+type PmysqlVcapServices struct {
+	ServiceInstances []ServiceInstances `json:"pmysql"`
+}
+type UserProvidedVcapServices struct {
+	ServiceInstances []ServiceInstances `json:"user-provided"`
 }
 
 type ServiceInstances struct {
