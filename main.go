@@ -30,24 +30,29 @@ func main() {
 	connBytes := os.Getenv("VCAP_SERVICES")
 
 	var myServices interface{}
+	var creds psifos.Credentials
 	myServices = &psifos.ClearDBVcapServices{}
 	err = json.Unmarshal([]byte(connBytes), myServices)
 	psifos.FreakOut(err)
-	if len(myServices.(*psifos.ClearDBVcapServices).ServiceInstances) < 1 {
+	if len(myServices.(*psifos.ClearDBVcapServices).ServiceInstances) > 0 {
+		creds = myServices.(*psifos.ClearDBVcapServices).ServiceInstances[0].Credentials
+	} else {
 		myServices = &psifos.PmysqlVcapServices{}
 		err = json.Unmarshal([]byte(connBytes), myServices)
 		psifos.FreakOut(err)
+		if len(myServices.(*psifos.PmysqlVcapServices).ServiceInstances) > 0 {
+			creds = myServices.(*psifos.PmysqlVcapServices).ServiceInstances[0].Credentials
+		} else {
+			myServices = &psifos.UserProvidedVcapServices{}
+			err = json.Unmarshal([]byte(connBytes), myServices)
+			psifos.FreakOut(err)
+			if len(myServices.(*psifos.UserProvidedVcapServices).ServiceInstances) > 0 {
+				creds = myServices.(*psifos.UserProvidedVcapServices).ServiceInstances[0].Credentials
+			} else {
+				panic(errors.New("Cannot connect to a suitable database"))
+			}
+		}
 	}
-	if len(myServices.(*psifos.PmysqlVcapServices).ServiceInstances) < 1 {
-		myServices = &psifos.UserProvidedVcapServices{}
-		err = json.Unmarshal([]byte(connBytes), myServices)
-		psifos.FreakOut(err)
-	}
-	if len(myServices.(*psifos.UserProvidedVcapServices).ServiceInstances) < 1 {
-		panic(errors.New("Cannot connect to a suitable database"))
-	}
-	creds := myServices.(*psifos.ClearDBVcapServices).ServiceInstances[0].Credentials
-
 	connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", creds.Username, creds.Password, creds.Hostname, creds.Port, creds.Name)
 
 	server.db, err = sql.Open("mysql", connString)
