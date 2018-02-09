@@ -29,22 +29,24 @@ func main() {
 	BlowUp(err)
 	connBytes := os.Getenv("VCAP_SERVICES")
 
-	myServices := &server.ClearDBVcapServices{}
+	var myServices interface{}
+	myServices = &psifos.ClearDBVcapServices{}
 	err = json.Unmarshal([]byte(connBytes), myServices)
-	server.FreakOut(err)
-	if len(myServices.ServiceInstances) < 1 {
-		myServices = &server.PmysqlVcapServices{}
+	psifos.FreakOut(err)
+	if len(myServices.(psifos.ClearDBVcapServices).ServiceInstances) < 1 {
+		myServices = &psifos.PmysqlVcapServices{}
 		err = json.Unmarshal([]byte(connBytes), myServices)
-		server.FreakOut(err)
+		psifos.FreakOut(err)
 	}
-	if len(myServices.ServiceInstances) < 1 {
-		myServices = &server.UserProvidVcapServices{}
+	if len(myServices.(psifos.PmysqlVcapServices).ServiceInstances) < 1 {
+		myServices = &psifos.UserProvidedVcapServices{}
 		err = json.Unmarshal([]byte(connBytes), myServices)
-		server.FreakOut(err)
+		psifos.FreakOut(err)
 	}
-	if len(myServices.ServiceInstances) < 1 {
+	if len(myServices.(psifos.UserProvidedVcapServices).ServiceInstances) < 1 {
 		panic(errors.New("Cannot connect to a suitable database"))
 	}
+	creds := myServices.(psifos.ClearDBVcapServices).ServiceInstances[0].Credentials
 
 	connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", creds.Username, creds.Password, creds.Hostname, creds.Port, creds.Name)
 
