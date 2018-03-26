@@ -100,8 +100,26 @@ func GetVcapServicesCreds() string {
 	connBytes := os.Getenv("VCAP_SERVICES")
 
 	myServices := &VcapServices{}
-	err := json.Unmarshal([]byte(connBytes), myServices)
-	FreakOut(err)
+
+	if connBytes != "" {
+		err := json.Unmarshal([]byte(connBytes), myServices)
+		FreakOut(err)
+	} else {
+		//running on kube
+		port, err := strconv.Atoi(os.Getenv("DB_PORT"))
+		FreakOut(err)
+		myServices.PmysqlVcapServices = []PMysqlServiceInstances{
+			PMysqlServiceInstances{
+				MysqlCredentials{
+					Username: os.Getenv("DB_USERNAME"),
+					Password: os.Getenv("DB_PASSWORD"),
+					Hostname: os.Getenv("DB_HOSTNAME"),
+					Port:     port,
+					Name:     os.Getenv("DB_DATABASE_NAME"),
+				},
+			},
+		}
+	}
 
 	creds, err := myServices.GetCreds()
 	FreakOut(err)
