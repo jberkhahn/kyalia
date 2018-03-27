@@ -1,0 +1,40 @@
+apiVersion: "v1"
+kind: Pod
+metadata:
+  name: kyalia
+  labels:
+    app: kyalia
+spec:
+  containers:
+    - name: psifos
+      image: swayr/kyalia:kube
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 8080
+          protocol: TCP
+      env:
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: binding
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: binding
+              key: password
+        - name: DB_HOSTNAME
+          valueFrom:
+            secretKeyRef:
+              name: binding
+              key: host
+        - name: DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: binding
+              key: port
+        - name: DB_DATABASE_NAME
+          valueFrom:
+            secretKeyRef:
+              name: binding
+              key: database
