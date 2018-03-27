@@ -22,9 +22,16 @@ type kyaliaServer struct {
 
 func main() {
 	server := NewKyaliaServer()
+
+	var portNumber int
+	var err error
 	port := os.Getenv("PORT")
-	portNumber, err := strconv.Atoi(port)
-	BlowUp(err)
+	if port != "" {
+		portNumber, err := strconv.Atoi(port)
+		BlowUp(err)
+	} else {
+		portNumber = 8080
+	}
 
 	server.db, err = sql.Open("mysql", psifos.GetVcapServicesCreds())
 	FreakOut(err)

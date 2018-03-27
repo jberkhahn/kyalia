@@ -37,6 +37,12 @@
 			"revisionTime": "2017-06-09T00:35:04Z"
 		},
 		{
+			"checksumSHA1": "Lz0BAw83v6p9N1Ry31kCXso5vmo=",
+			"path": "github.com/swetharepakula/psifos",
+			"revision": "303dc7cb80abb9b8895c6ada254937c3b0508244",
+			"revisionTime": "2018-03-27T18:01:17Z"
+		},
+		{
 			"checksumSHA1": "I5DfsqBiMQqPYspyWlPHhkcpAKs=",
 			"path": "github.com/swetharepakula/psifos/server",
 			"revision": "c7cfbf0c3b89d20b47fcdb07a68e64f091e4c5d3",
